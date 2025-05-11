@@ -1,5 +1,13 @@
 # Home Sharing Platform
 
+Live Demo: [https://home-sharing-platform-five.vercel.app/](https://home-sharing-platform-five.vercel.app/)
+
+Demo Credentials:
+```
+Email: emma@example.com
+Password: emma123!
+```
+
 A full-stack web application for listing and booking homes, built with Next.js, Node.js, and MongoDB. This platform allows users to list their properties, search for available homes, and manage bookings seamlessly.
 
 ## 🌟 Features
