@@ -42,9 +42,7 @@ A full-stack web application for listing and booking homes, built with Next.js, 
   - Update profile and preferences
 
 ### Responsive Design
-- Mobile-first approach
 - Optimized for all screen sizes
-- Touch-friendly interface
 - Fast loading and smooth transitions
 
 ## 🛠️ Tech Stack
