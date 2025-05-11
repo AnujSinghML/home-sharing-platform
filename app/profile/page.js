@@ -6,6 +6,9 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import Image from 'next/image';
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export default function ProfilePage() {
   const { data: session, update } = useSession();
   const router = useRouter();

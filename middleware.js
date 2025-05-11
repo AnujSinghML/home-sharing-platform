@@ -12,11 +12,15 @@ export default withAuth(
   }
 );
 
+// Update to use the new config format
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
+// Define protected routes
 export const config = {
   matcher: [
-    '/dashboard/:path*',
+    '/dashboard/:path*', 
     '/listings/create',
-    '/listings/edit/:path*',
     '/bookings/:path*',
   ],
 };

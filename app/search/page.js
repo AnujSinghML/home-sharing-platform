@@ -1,11 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'react-hot-toast';
 
-export default function SearchPage() {
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
+function SearchContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [listings, setListings] = useState([]);
@@ -148,5 +151,13 @@ export default function SearchPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SearchContent />
+    </Suspense>
   );
 } 

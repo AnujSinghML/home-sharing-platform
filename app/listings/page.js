@@ -1,13 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import ListingCard from '@/components/listings/ListingCard';
 import SearchForm from '@/components/listings/SearchForm';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
-export default function ListingsPage() {
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
+function ListingsContent() {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -207,5 +210,13 @@ export default function ListingsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function ListingsPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ListingsContent />
+    </Suspense>
   );
 } 

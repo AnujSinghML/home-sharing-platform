@@ -4,6 +4,9 @@ import { connectToDB } from '@/lib/mongoose';
 import Booking from '@/models/Booking';
 import { authOptions } from '../../auth/[...nextauth]/route';
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export async function GET(req) {
   try {
     const session = await getServerSession(authOptions);
