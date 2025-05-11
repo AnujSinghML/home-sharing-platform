@@ -3,6 +3,9 @@ import cloudinary from '@/lib/cloudinary';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../auth/[...nextauth]/route';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 export async function POST(req) {
   try {
     const session = await getServerSession(authOptions);
