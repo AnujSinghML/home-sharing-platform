@@ -21,6 +21,8 @@ export async function OPTIONS() {
 }
 
 export async function POST(req) {
+  console.log('Upload endpoint called');
+  
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -28,9 +30,7 @@ export async function POST(req) {
   };
 
   try {
-    console.log('Starting upload process...');
-    
-    // Check if Cloudinary is configured
+    // 1. Validate Cloudinary configuration
     if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
       console.error('Cloudinary configuration missing');
       return NextResponse.json(
@@ -39,6 +39,7 @@ export async function POST(req) {
       );
     }
 
+    // 2. Validate session
     const session = await getServerSession(authOptions);
     if (!session) {
       console.log('No session found');
@@ -48,7 +49,8 @@ export async function POST(req) {
       );
     }
 
-    console.log('Session validated, processing form data...');
+    // 3. Get file from form data
+    console.log('Processing form data...');
     const formData = await req.formData();
     const file = formData.get('file');
 
@@ -60,19 +62,20 @@ export async function POST(req) {
       );
     }
 
-    console.log('File received:', {
+    // 4. Log file details
+    console.log('File details:', {
       name: file.name,
       type: file.type,
       size: file.size
     });
 
-    // Convert the file to a buffer
+    // 5. Convert file to buffer
     console.log('Converting file to buffer...');
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    console.log('Buffer created, uploading to Cloudinary...');
-    // Upload to Cloudinary
+    // 6. Upload to Cloudinary
+    console.log('Starting Cloudinary upload...');
     const result = await new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
@@ -84,13 +87,12 @@ export async function POST(req) {
             console.error('Cloudinary upload error:', error);
             reject(error);
           } else {
-            console.log('Upload successful:', result);
+            console.log('Cloudinary upload successful:', result);
             resolve(result);
           }
         }
       );
 
-      // Handle stream errors
       uploadStream.on('error', (error) => {
         console.error('Upload stream error:', error);
         reject(error);
@@ -99,17 +101,24 @@ export async function POST(req) {
       uploadStream.end(buffer);
     });
 
+    // 7. Return success response
     console.log('Upload complete, returning response');
-    return NextResponse.json(result, { headers });
+    return NextResponse.json({
+      success: true,
+      data: result
+    }, { headers });
+
   } catch (error) {
+    // 8. Handle errors
     console.error('Upload error:', error);
-    return NextResponse.json(
-      { 
-        error: 'Error uploading file', 
-        details: error.message,
-        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-      },
-      { status: 500, headers }
-    );
+    return NextResponse.json({
+      success: false,
+      error: 'Error uploading file',
+      details: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    }, { 
+      status: 500, 
+      headers 
+    });
   }
 } 
