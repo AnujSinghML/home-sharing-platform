@@ -69,39 +69,20 @@ export async function POST(req) {
       size: file.size
     });
 
-    // 5. Convert file to buffer
-    console.log('Converting file to buffer...');
+    // 5. Convert file to base64
+    console.log('Converting file to base64...');
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
+    const base64String = buffer.toString('base64');
+    const dataURI = `data:${file.type};base64,${base64String}`;
 
     // 6. Upload to Cloudinary
     console.log('Starting Cloudinary upload...');
-    const result = await new Promise((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        {
-          folder: 'home-sharing',
-          resource_type: 'auto',
-        },
-        (error, result) => {
-          if (error) {
-            console.error('Cloudinary upload error:', error);
-            reject(error);
-          } else {
-            console.log('Cloudinary upload successful:', result);
-            resolve(result);
-          }
-        }
-      );
-
-      uploadStream.on('error', (error) => {
-        console.error('Upload stream error:', error);
-        reject(error);
-      });
-
-      uploadStream.end(buffer);
+    const result = await cloudinary.uploader.upload(dataURI, {
+      folder: 'home-sharing',
+      resource_type: 'auto',
     });
 
-    // 7. Return success response
     console.log('Upload complete, returning response');
     return NextResponse.json({
       success: true,
