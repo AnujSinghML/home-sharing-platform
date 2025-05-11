@@ -215,7 +215,7 @@ export default function ProfilePage() {
               <p className="mt-1 text-sm text-gray-500">Email cannot be changed</p>
             </div>
 
-            <div className="border-t pt-6">
+            <div>
               <h2 className="text-lg font-medium mb-4">Change Password</h2>
               
               <div className="space-y-4">

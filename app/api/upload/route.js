@@ -6,7 +6,7 @@ import { authOptions } from '../auth/[...nextauth]/route';
 // Configure the route
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-export const maxDuration = 300; // 5 minutes timeout
+export const maxDuration = 60; // 60 seconds timeout (Vercel hobby plan limit)
 
 // Handle OPTIONS request for CORS
 export async function OPTIONS() {
