@@ -52,7 +52,7 @@ export default function ProfilePage() {
         throw new Error('Failed to upload image');
       }
 
-      const data = await response.json();
+      const { data } = await response.json();
       
       // Update profile with new image
       const updateResponse = await fetch('/api/users/profile', {

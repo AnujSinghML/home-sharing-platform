@@ -78,7 +78,7 @@ export default function CreateListingPage() {
           throw new Error('Failed to upload image');
         }
 
-        const data = await response.json();
+        const { data } = await response.json();
         return data.secure_url;
       });
 
