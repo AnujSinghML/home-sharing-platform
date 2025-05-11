@@ -20,16 +20,24 @@ export async function OPTIONS() {
 }
 
 export async function POST(req) {
-  try {
-    // Add CORS headers
-    const headers = {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    };
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  };
 
+  try {
     console.log('Starting upload process...');
     
+    // Check if Cloudinary is configured
+    if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+      console.error('Cloudinary configuration missing');
+      return NextResponse.json(
+        { error: 'Cloudinary configuration missing' },
+        { status: 500, headers }
+      );
+    }
+
     const session = await getServerSession(authOptions);
     if (!session) {
       console.log('No session found');
@@ -51,15 +59,21 @@ export async function POST(req) {
       );
     }
 
-    console.log('File received, converting to buffer...');
+    console.log('File received:', {
+      name: file.name,
+      type: file.type,
+      size: file.size
+    });
+
     // Convert the file to a buffer
+    console.log('Converting file to buffer...');
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
     console.log('Buffer created, uploading to Cloudinary...');
     // Upload to Cloudinary
     const result = await new Promise((resolve, reject) => {
-      cloudinary.uploader.upload_stream(
+      const uploadStream = cloudinary.uploader.upload_stream(
         {
           folder: 'home-sharing',
           resource_type: 'auto',
@@ -73,7 +87,15 @@ export async function POST(req) {
             resolve(result);
           }
         }
-      ).end(buffer);
+      );
+
+      // Handle stream errors
+      uploadStream.on('error', (error) => {
+        console.error('Upload stream error:', error);
+        reject(error);
+      });
+
+      uploadStream.end(buffer);
     });
 
     console.log('Upload complete, returning response');
@@ -81,12 +103,12 @@ export async function POST(req) {
   } catch (error) {
     console.error('Upload error:', error);
     return NextResponse.json(
-      { error: 'Error uploading file', details: error.message },
-      { status: 500, headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      }}
+      { 
+        error: 'Error uploading file', 
+        details: error.message,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      },
+      { status: 500, headers }
     );
   }
 } 
